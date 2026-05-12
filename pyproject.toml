@@ -1,0 +1,29 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "contamination-audit"
+version = "0.1.0"
+description = "N-gram, embedding, canary, answer-pattern, and corpus contamination auditor."
+readme = "README.md"
+requires-python = ">=3.10"
+license = "MIT"
+authors = [{ name = "AuraOne" }]
+classifiers = ["Development Status :: 3 - Alpha", "Programming Language :: Python :: 3.10", "Programming Language :: Python :: 3.11", "Programming Language :: Python :: 3.12"]
+dependencies = []
+
+[project.urls]
+Homepage = "https://auraone.ai/open"
+Source = "https://github.com/auraoneai/contamination-audit"
+
+[project.scripts]
+contamination-audit = "contamination_audit.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+addopts = "-q"
+pythonpath = ["src"]
+testpaths = ["tests"]
