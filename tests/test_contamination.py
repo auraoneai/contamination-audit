@@ -28,6 +28,37 @@ def test_embedding_detector_positive_and_negative():
 
     assert any(f["reference_id"] == "similar" for f in findings)
     assert not any(f["reference_id"] == "different" for f in findings)
+    assert {f["backend"] for f in findings} == {"lexical-bow"}
+
+
+def test_embedding_detector_sentence_transformers_backend_with_injected_model():
+    class FakeSentenceTransformer:
+        def encode(self, texts, normalize_embeddings=True):
+            assert normalize_embeddings is True
+            vectors = {
+                "robot arm opens drawer": [1.0, 0.0],
+                "manipulator opens cabinet": [0.95, 0.05],
+                "invoice policy renewal": [0.0, 1.0],
+            }
+            return [vectors[text] for text in texts]
+
+    items = [{"item_id": "eval", "prompt": "robot arm opens drawer"}]
+    refs = [
+        {"item_id": "semantic", "prompt": "manipulator opens cabinet"},
+        {"item_id": "different", "prompt": "invoice policy renewal"},
+    ]
+
+    findings = embedding.detect(items, refs, threshold=0.9, backend="sentence-transformers", model=FakeSentenceTransformer())
+
+    assert findings == [
+        {
+            "detector": "embedding",
+            "item_id": "eval",
+            "reference_id": "semantic",
+            "score": 0.998618,
+            "backend": "sentence-transformers",
+        }
+    ]
 
 
 def test_canary_detector_positive_and_negative():

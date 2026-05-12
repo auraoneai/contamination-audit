@@ -13,6 +13,9 @@ authors = [{ name = "AuraOne" }]
 classifiers = ["Development Status :: 3 - Alpha", "Programming Language :: Python :: 3.10", "Programming Language :: Python :: 3.11", "Programming Language :: Python :: 3.12"]
 dependencies = []
 
+[project.optional-dependencies]
+embedding = ["sentence-transformers>=2.7"]
+
 [project.urls]
 Homepage = "https://auraone.ai/open"
 Source = "https://github.com/auraoneai/contamination-audit"
