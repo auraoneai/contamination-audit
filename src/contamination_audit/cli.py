@@ -5,9 +5,9 @@ from .corpora.registry import REGISTRY
 from .report import build
 
 def load(path): return [json.loads(line) for line in Path(path).read_text().splitlines() if line.strip()]
-def run(items, references=None, outputs=None, registry=None, include_embedding=True, embedding_backend=None, embedding_model=None):
+def run(items, references=None, outputs=None, registry=None, corpora=None, include_embedding=True, embedding_backend=None, embedding_model=None):
     references = references if references is not None else items
-    registry = registry if registry is not None else REGISTRY
+    registry = select_registry(registry if registry is not None else REGISTRY, corpora)
     findings=[]
     findings += ngram.detect(items, references)
     findings += answer_pattern.detect(items)
@@ -18,5 +18,14 @@ def run(items, references=None, outputs=None, registry=None, include_embedding=T
     return build(findings, len(items))
 def main(argv=None):
     p=argparse.ArgumentParser(prog="contamination-audit"); sub=p.add_subparsers(dest="cmd", required=True); r=sub.add_parser("run"); r.add_argument("--eval-data", required=True); r.add_argument("--corpora", default="pile,c4,hf-mmlu"); r.add_argument("--embedding-backend", choices=["lexical", "sentence-transformers"], default=None); r.add_argument("--embedding-model", default=None); r.add_argument("--skip-embedding", action="store_true")
-    args=p.parse_args(argv); print(json.dumps(run(load(args.eval_data), include_embedding=not args.skip_embedding, embedding_backend=args.embedding_backend, embedding_model=args.embedding_model), indent=2)); return 0
+    args=p.parse_args(argv); print(json.dumps(run(load(args.eval_data), corpora=args.corpora, include_embedding=not args.skip_embedding, embedding_backend=args.embedding_backend, embedding_model=args.embedding_model), indent=2)); return 0
+
+def select_registry(registry, corpora):
+    if not corpora:
+        return registry
+    names = [name.strip() for name in corpora.split(",") if name.strip()] if isinstance(corpora, str) else list(corpora)
+    missing = [name for name in names if name not in registry]
+    if missing:
+        raise ValueError(f"Unknown corpora: {', '.join(missing)}")
+    return {name: registry[name] for name in names}
 if __name__ == "__main__": raise SystemExit(main())

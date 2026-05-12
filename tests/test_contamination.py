@@ -1,6 +1,6 @@
 import json
 
-from contamination_audit.cli import main, run
+from contamination_audit.cli import main, run, select_registry
 from contamination_audit.detectors import answer_pattern, canary, embedding, ngram, public_corpus
 
 
@@ -106,6 +106,16 @@ def test_combined_run_is_reproducible_and_item_level():
     assert first["item_count"] == 2
     detectors = {f["detector"] for f in first["findings"]}
     assert {"ngram", "embedding", "answer_pattern", "public_corpus", "canary"} <= detectors
+
+
+def test_corpora_filter_limits_public_corpus_registry():
+    registry = {"hf-mmlu": {"hash": "abc123"}, "c4": {"hash": "c4hash"}}
+    items = [{"item_id": "hit", "hash": "abc123"}, {"item_id": "filtered", "hash": "c4hash"}]
+
+    report = run(items, registry=registry, corpora="hf-mmlu", include_embedding=False)
+
+    assert select_registry(registry, "hf-mmlu") == {"hf-mmlu": {"hash": "abc123"}}
+    assert [finding["item_id"] for finding in report["findings"]] == ["hit"]
 
 
 def test_cli_run_smoke(tmp_path, capsys):
