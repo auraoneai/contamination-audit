@@ -1,6 +1,59 @@
 # contamination-audit
 
-Generate item-level signals that help reviewers investigate possible evaluation-data leakage.
+**Benchmark contamination scanner.** Generate item-level signals that help
+reviewers investigate possible evaluation-data leakage.
+
+[![PyPI](https://img.shields.io/pypi/v/contamination-audit)](https://pypi.org/project/contamination-audit/)
+[![CI](https://github.com/auraoneai/contamination-audit/actions/workflows/ci.yml/badge.svg)](https://github.com/auraoneai/contamination-audit/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue)](https://github.com/auraoneai/contamination-audit/blob/main/LICENSE)
+
+From a source checkout:
+
+```bash
+python -m pip install contamination-audit==0.1.2
+contamination-audit run --eval-data examples/eval.jsonl --skip-embedding
+```
+
+Output on the bundled synthetic eval file (exit code `0`):
+
+```json
+{
+  "item_count": 2,
+  "finding_count": 1,
+  "aggregate_risk_score": 0.1,
+  "findings": [
+    {
+      "detector": "answer_pattern",
+      "item_id": "1",
+      "match": "The answer is (B)"
+    }
+  ],
+  "synthetic": true,
+  "reproducible": true
+}
+```
+
+## What It Does and Doesn't Do
+
+It does:
+
+- run n-gram overlap, answer-pattern, canary, registry-hash, lexical
+  similarity, and optional sentence-transformers checks locally;
+- report every detector-level finding with item ids and matched evidence.
+
+It doesn't:
+
+- prove contamination or cleanliness. Findings are risk signals for a reviewer
+  to investigate;
+- download or search real corpora. The built-in `pile`, `c4`, and `hf-mmlu`
+  registry entries are synthetic marker hashes.
+
+Part of the AuraOne review quality workflow:
+[judge-bench](https://auraone.ai/open/judge-bench) →
+[evalkit](https://auraone.ai/open/evalkit).
+Project page: [auraone.ai/open/contamination-audit](https://auraone.ai/open/contamination-audit).
+
+## Overview
 
 `contamination-audit` is for benchmark maintainers and evaluation engineers who want a local, inspectable preflight before deeper contamination analysis. It combines n-gram overlap, answer-pattern checks, canary matching, synthetic registry-hash matching, lexical similarity, and an optional sentence-transformers backend.
 
@@ -58,3 +111,8 @@ This package emits diagnostic signals, not proof that data is contaminated or cl
 ## Next Action
 
 Run the no-download CLI path to inspect the report shape, then call the Python API with approved, separated references and model outputs before using any finding in a contamination review.
+
+---
+
+Need an independent model-quality evaluation or benchmark program?
+[Talk to AuraOne](https://auraone.ai/contact?from=open:contamination-audit)

@@ -5,12 +5,12 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "contamination-audit"
 version = "0.1.2"
-description = "Generate item-level eval contamination signals from lexical, canary, pattern, hash, and optional embedding checks."
+description = "Benchmark contamination scanner: item-level eval leakage signals from lexical, canary, pattern, hash, and embedding checks."
 readme = "README.md"
 requires-python = ">=3.10"
 license = "MIT"
 authors = [{ name = "AuraOne" }]
-keywords = ["evaluation-data", "data-contamination", "benchmark-leakage", "llm-evaluation", "canary", "embedding-similarity"]
+keywords = ["evaluation-data", "data-contamination", "benchmark-leakage", "llm-evaluation", "canary", "embedding-similarity", "benchmark-contamination"]
 classifiers = [
   "Development Status :: 3 - Alpha",
   "Environment :: Console",
@@ -29,11 +29,12 @@ dependencies = []
 embedding = ["sentence-transformers>=2.7"]
 
 [project.urls]
-Homepage = "https://github.com/auraoneai/contamination-audit"
+Homepage = "https://auraone.ai/open/contamination-audit"
 Documentation = "https://github.com/auraoneai/contamination-audit#readme"
 Repository = "https://github.com/auraoneai/contamination-audit.git"
 Issues = "https://github.com/auraoneai/contamination-audit/issues"
 Changelog = "https://github.com/auraoneai/contamination-audit/blob/main/CHANGELOG.md"
+Source = "https://github.com/auraoneai/contamination-audit"
 
 [project.scripts]
 contamination-audit = "contamination_audit.cli:main"
